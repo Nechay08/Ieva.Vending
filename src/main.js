@@ -147,6 +147,7 @@ async function startCheckout(button) {
   checkoutPending = true
   button.disabled = true
   status.textContent = ''
+  let diagnostic = 'checkout_connection'
   try {
     const items = products.filter(({id}) => bag[id]).map(({id}) => ({id, quantity: bag[id]}))
     const response = await fetch(checkoutEndpoint, {
@@ -155,7 +156,12 @@ async function startCheckout(button) {
       body: JSON.stringify({ items, language: lang }),
       signal: AbortSignal.timeout(15000)
     })
+    diagnostic = `http_${response.status}`
     const result = await response.json()
+    if (!response.ok && /^[a-z_]{1,32}$/.test(result.error ?? '')) {
+      diagnostic = result.error
+      if (/^req_[a-zA-Z0-9]+$/.test(result.requestId ?? '')) diagnostic += ' · ' + result.requestId
+    }
     if (!response.ok || !result.url?.startsWith('https://checkout.stripe.com/')) throw new Error()
     location.assign(result.url)
   } catch {
@@ -163,7 +169,7 @@ async function startCheckout(button) {
     const current = panel.querySelector('[data-checkout]')
     if (current) {
       current.disabled = false
-      panel.querySelector('[data-checkout-status]').textContent = t().checkoutError
+      panel.querySelector('[data-checkout-status]').textContent = `${t().checkoutError} (${diagnostic})`
     }
   }
 }

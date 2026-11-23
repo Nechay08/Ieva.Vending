@@ -71,13 +71,24 @@ export function checkoutMiddleware({ key, origin, fetchStripe = fetch }) {
         body: params,
         signal: AbortSignal.timeout(12000)
       })
+      if (!response.ok) {
+        const errorCodes = {
+          400: 'stripe_request',
+          401: 'stripe_key',
+          403: 'stripe_permission',
+          429: 'stripe_rate_limit'
+        }
+        const requestId = response.headers.get('request-id')
+        const safeRequestId = /^req_[a-zA-Z0-9]+$/.test(requestId ?? '') ? requestId : undefined
+        return json(res, 502, { error: errorCodes[response.status] ?? 'stripe_service', requestId: safeRequestId })
+      }
       const session = await response.json()
-      if (!response.ok || session.livemode !== false || !session.url?.startsWith('https://checkout.stripe.com/')) {
-        return json(res, 502, { error: 'stripe' })
+      if (session.livemode !== false || typeof session.url !== 'string' || !session.url.startsWith('https://checkout.stripe.com/')) {
+        return json(res, 502, { error: 'stripe_session' })
       }
       return json(res, 200, { url: session.url })
     } catch {
-      return json(res, 502, { error: 'stripe' })
+      return json(res, 502, { error: 'stripe_connection' })
     }
   }
 }
