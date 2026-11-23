@@ -1,0 +1,50 @@
+export const copy = {
+  en: {
+    language:'Language', bag:'Bag', hero:['Little things.', 'Better days.'],
+    intro:'Beauty, travel and everyday essentials, thoughtfully sized for wherever life takes you.',
+    shop:'Explore the collection', collection:'The Essentials Collection',
+    collectionIntro:'Small finds for your bag, your routine and everything in between.',
+    all:'Shop all', beauty:'Beauty', travel:'Travel', daily:'Everyday', add:'Add to bag', added:'Added to your bag',
+    vendingTitle:['Care, right', 'when you need it.'],
+    vendingIntro:'A compact self-service vending machine for personal care and everyday essentials on the go.',
+    inside:'What’s inside', insideIntro:'Six everyday essentials, ready when you need them.',
+    how:'How to buy', steps:['Choose an item','Follow the payment instructions on the machine','Collect your item from the pickup slot'],
+    where:'Locations', contact:'Contact', support:'Support',
+    empty:'Your bag is empty.', remove:'Remove', quantity:'Quantity', close:'Close',
+    demo:'Preview only. Prices and checkout will be available when the shop launches.',
+    back:'Back to the collection', machine:'Illustration of the Evo personal-care vending machine',
+    heroAlt:'Compact beauty and travel essentials arranged on a soft pink surface'
+  },
+  lv: {
+    language:'Valoda', bag:'Grozs', hero:['Mazas lietas.', 'Labākas dienas.'],
+    intro:'Kompakti skaistumkopšanas, ceļojumu un ikdienas piederumi, lai kurp tu dotos.',
+    shop:'Apskatīt kolekciju', collection:'Evo Essentials kolekcija',
+    collectionIntro:'Noderīgas lietas tavai somai, ikdienai un ceļojumiem.',
+    all:'Visi produkti', beauty:'Skaistumkopšana', travel:'Ceļojumiem', daily:'Ikdienai', add:'Pievienot grozam', added:'Pievienots grozam',
+    vendingTitle:['Rūpes tieši tad,', 'kad tās vajadzīgas.'],
+    vendingIntro:'Kompakts pašapkalpošanās automāts ar higiēnas un ikdienas precēm, kad esi ceļā.',
+    inside:'Kas ir automātā?', insideIntro:'Sešas ikdienas preces brīžiem, kad tās vajadzīgas.',
+    how:'Kā iegādāties', steps:['Izvēlies preci','Seko maksājuma norādēm uz automāta','Paņem preci no izsniegšanas nodalījuma'],
+    where:'Atrašanās vietas', contact:'Kontakti', support:'Atbalsts',
+    empty:'Tavs grozs ir tukšs.', remove:'Noņemt', quantity:'Daudzums', close:'Aizvērt',
+    demo:'Veikala priekšskatījums. Cenas un pasūtīšana būs pieejamas pēc atvēršanas.',
+    back:'Atpakaļ uz kolekciju', machine:'Evo higiēnas preču automāta ilustrācija',
+    heroAlt:'Kompakti skaistumkopšanas un ceļojumu piederumi uz maigi rozā fona'
+  },
+  ru: {
+    language:'Язык', bag:'Корзина', hero:['Маленькие вещи.', 'Для лучших дней.'],
+    intro:'Компактные аксессуары для красоты, путешествий и повседневной жизни.',
+    shop:'Смотреть коллекцию', collection:'Коллекция Evo Essentials',
+    collectionIntro:'Полезные мелочи для сумки, ежедневного ухода и поездок.',
+    all:'Все товары', beauty:'Красота', travel:'В дорогу', daily:'На каждый день', add:'В корзину', added:'Добавлено в корзину',
+    vendingTitle:['Забота рядом,', 'когда она нужна.'],
+    vendingIntro:'Компактный автомат самообслуживания со средствами гигиены и полезными мелочами на каждый день.',
+    inside:'Что внутри', insideIntro:'Шесть вещей на каждый день, которые могут понадобиться в дороге.',
+    how:'Как купить', steps:['Выбери товар','Следуй инструкциям по оплате на автомате','Забери покупку из отсека выдачи'],
+    where:'Адреса', contact:'Контакты', support:'Поддержка',
+    empty:'Корзина пока пуста.', remove:'Удалить', quantity:'Количество', close:'Закрыть',
+    demo:'Предпросмотр магазина. Цены и оформление заказов появятся после запуска.',
+    back:'Вернуться к коллекции', machine:'Иллюстрация автомата Evo со средствами гигиены',
+    heroAlt:'Компактные аксессуары для красоты и путешествий на нежно-розовом фоне'
+  }
+}
