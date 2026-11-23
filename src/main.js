@@ -152,7 +152,10 @@ async function startCheckout(button) {
     const items = products.filter(({id}) => bag[id]).map(({id}) => ({id, quantity: bag[id]}))
     const response = await fetch(checkoutEndpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Ieva-Checkout-Origin': location.origin
+      },
       body: JSON.stringify({ items, language: lang }),
       signal: AbortSignal.timeout(15000)
     })

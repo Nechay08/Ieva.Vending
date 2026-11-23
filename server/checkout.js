@@ -20,6 +20,7 @@ async function parseBody(req) {
 
 export function checkoutMiddleware({ key, origin, fetchStripe = fetch }) {
   const enabled = /^sk_test_\S+$/.test(key) && Boolean(origin)
+  const codespacesOrigin = /^https:\/\/[a-z0-9-]+-\d+\.app\.github\.dev$/.test(origin)
 
   return async (req, res, next) => {
     const path = req.url?.split('?')[0]
@@ -27,7 +28,15 @@ export function checkoutMiddleware({ key, origin, fetchStripe = fetch }) {
     if (req.method === 'GET') return json(res, 200, { enabled })
     if (req.method !== 'POST') return json(res, 405, { error: 'method' })
     if (!enabled) return json(res, 503, { error: 'unavailable' })
-    if (req.headers.origin !== origin) return json(res, 403, { error: 'origin' })
+    const fetchSite = req.headers['sec-fetch-site']
+    const browserOrigin = req.headers['x-ieva-checkout-origin']
+    // The Codespaces port proxy can change the standard Origin header.
+    const forwardedSameOrigin = codespacesOrigin && fetchSite === 'same-origin' && browserOrigin === origin
+    if ((fetchSite && fetchSite !== 'same-origin') ||
+        (browserOrigin && browserOrigin !== origin) ||
+        (req.headers.origin !== origin && !forwardedSameOrigin)) {
+      return json(res, 403, { error: 'origin' })
+    }
 
     let order
     try { order = await parseBody(req) }
