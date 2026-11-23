@@ -23,8 +23,9 @@ Open the URL Vite prints. For a production build, run `npm run build`.
 
 ## Stripe test checkout
 
-The preview works without Stripe credentials. To enable test payments, add two
-server-side environment variables and restart Vite:
+The preview shows demo prices and lets you simulate checkout without credentials.
+To open the Stripe sandbox checkout instead, add two server-side environment
+variables and restart Vite:
 
 - `STRIPE_SECRET_KEY` — a Stripe sandbox secret beginning with `sk_test_`.
 - `IEVA_CHECKOUT_ORIGIN` — the exact browser origin of the preview, e.g.

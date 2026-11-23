@@ -128,20 +128,25 @@ function formatPrice(cents) {
 }
 
 function checkoutControls() {
-  if (!checkoutEnabled || !count()) return ''
+  if (!count()) return ''
   const subtotal = products.reduce((total, {id}) => total + bag[id] * testPrices[id], 0)
   return `<div class="checkout-controls">
     <p>${t().testSubtotal} <strong>${formatPrice(subtotal)}</strong></p>
-    <button class="primary" data-checkout ${checkoutPending ? 'disabled' : ''}>${t().checkout}</button>
+    <button class="primary" data-checkout ${checkoutPending ? 'disabled' : ''}>${checkoutEnabled ? t().checkout : t().simulateCheckout}</button>
     <p role="status" data-checkout-status></p>
   </div>`
 }
 
 async function startCheckout(button) {
-  if (checkoutPending || !checkoutEnabled) return
+  if (checkoutPending) return
+  const status = panel.querySelector('[data-checkout-status]')
+  if (!checkoutEnabled) {
+    status.textContent = t().simulationComplete
+    return
+  }
   checkoutPending = true
   button.disabled = true
-  panel.querySelector('[data-checkout-status]').textContent = ''
+  status.textContent = ''
   try {
     const items = products.filter(({id}) => bag[id]).map(({id}) => ({id, quantity: bag[id]}))
     const response = await fetch(checkoutEndpoint, {
@@ -172,10 +177,10 @@ function renderPanel() {
   panel.innerHTML = `<div class="panel-head"><h2 id="panel-title">${title}</h2><button class="icon-button" data-close aria-label="${text.close}">${icon('close')}</button></div>` +
     (product ? `<img class="detail-img" src="${asset(product.id)}" alt="${title}"><p class="eyebrow">${text[product.category]}</p><button class="primary" data-add="${product.id}">${text.add}</button>`
     : `<div class="bag-items">${count() ? products.filter(({id}) => bag[id]).map(({id, name}) => `
-      <div class="bag-line"><img src="${asset(id)}" alt=""><div><strong>${name[lang]}</strong>${checkoutEnabled ? `<p>${formatPrice(testPrices[id])}</p>` : ''}
+      <div class="bag-line"><img src="${asset(id)}" alt=""><div><strong>${name[lang]}</strong><p>${formatPrice(testPrices[id])}</p>
         <div class="quantity"><button data-quantity="${id}" data-change="-1" aria-label="${text.quantity} −">−</button><span>${bag[id]}</span><button data-quantity="${id}" data-change="1" aria-label="${text.quantity} +">+</button></div>
         <button class="remove" data-remove="${id}">${text.remove}</button></div></div>`).join('') : `<p>${text.empty}</p>`}</div>`) +
-    `${product ? '' : checkoutControls()}<p class="panel-note">${checkoutEnabled ? text.testNote : text.demo}</p>`
+    `${product ? '' : checkoutControls()}<p class="panel-note">${text.testNote}</p>`
 }
 
 function showPanel(id) {

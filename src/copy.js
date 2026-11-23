@@ -1,5 +1,7 @@
 export const copy = {
   en: {
+    simulateCheckout: "Simulate checkout",
+    simulationComplete: "Demo complete. No payment was taken and no order was placed.",
     checkout: "Test checkout",
     testNote: "Test prices · no real orders or charges",
     testSubtotal: "Test subtotal",
@@ -17,11 +19,12 @@ export const copy = {
     how:'How to buy', steps:['Choose an item','Follow the payment instructions on the machine','Collect your item from the pickup slot'],
     where:'Locations', contact:'Contact', support:'Support',
     empty:'Your bag is empty.', remove:'Remove', quantity:'Quantity', close:'Close',
-    demo:'Preview only. Prices and checkout will be available when the shop launches.',
     back:'Back to the collection', machine:'Illustration of the Ieva personal-care vending machine',
     heroAlt:'Compact beauty and travel essentials arranged on a soft pink surface'
   },
   lv: {
+    simulateCheckout: "Izmēģināt pasūtīšanu",
+    simulationComplete: "Izmēģinājums pabeigts. Maksājums netika veikts, un pasūtījums netika izveidots.",
     checkout: "Testa maksājums",
     testNote: "Testa cenas · bez īstiem pasūtījumiem vai maksājumiem",
     testSubtotal: "Testa starpsumma",
@@ -39,11 +42,12 @@ export const copy = {
     how:'Kā iegādāties', steps:['Izvēlies preci','Seko maksājuma norādēm uz automāta','Paņem preci no izsniegšanas nodalījuma'],
     where:'Atrašanās vietas', contact:'Kontakti', support:'Atbalsts',
     empty:'Tavs grozs ir tukšs.', remove:'Noņemt', quantity:'Daudzums', close:'Aizvērt',
-    demo:'Veikala priekšskatījums. Cenas un pasūtīšana būs pieejamas pēc atvēršanas.',
     back:'Atpakaļ uz kolekciju', machine:'Ieva higiēnas preču automāta ilustrācija',
     heroAlt:'Kompakti skaistumkopšanas un ceļojumu piederumi uz maigi rozā fona'
   },
   ru: {
+    simulateCheckout: "Попробовать оформление",
+    simulationComplete: "Демо завершено. Оплата не списана, заказ не создан.",
     checkout: "Тестовая оплата",
     testNote: "Тестовые цены · без реальных заказов и списаний",
     testSubtotal: "Тестовая сумма",
@@ -61,7 +65,6 @@ export const copy = {
     how:'Как купить', steps:['Выбери товар','Следуй инструкциям по оплате на автомате','Забери покупку из отсека выдачи'],
     where:'Адреса', contact:'Контакты', support:'Поддержка',
     empty:'Корзина пока пуста.', remove:'Удалить', quantity:'Количество', close:'Закрыть',
-    demo:'Предпросмотр магазина. Цены и оформление заказов появятся после запуска.',
     back:'Вернуться к коллекции', machine:'Иллюстрация автомата Ieva со средствами гигиены',
     heroAlt:'Компактные аксессуары для красоты и путешествий на нежно-розовом фоне'
   }
