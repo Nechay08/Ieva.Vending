@@ -37,13 +37,18 @@ const count = () => Object.values(bag).reduce((sum, quantity) => sum + quantity,
 const isVending = () => location.hash === '#vending'
 const t = () => copy[lang]
 
+function brandLink() {
+  const logo = import.meta.env.BASE_URL + 'images/ieva-logo.svg'
+  return `<a class="wordmark" href="#essentials"><img src="${logo}" alt="Ieva Vending" width="575" height="647"></a>`
+}
+
 function header() {
   const text = t()
   return `<header class="header">
-    <a class="wordmark" href="#essentials" aria-label="Evo">evo<span>.</span></a>
-    <nav aria-label="Evo">
-      <a href="#essentials" ${!isVending() ? 'aria-current="page"' : ''}>Evo Essentials</a>
-      <a href="#vending" ${isVending() ? 'aria-current="page"' : ''}>Evo Vending</a>
+    ${brandLink()}
+    <nav aria-label="Ieva">
+      <a href="#essentials" ${!isVending() ? 'aria-current="page"' : ''}>Ieva Essentials</a>
+      <a href="#vending" ${isVending() ? 'aria-current="page"' : ''}>Ieva Vending</a>
     </nav>
     <div class="header-tools">
       <label class="language">${icon('globe')}<select id="language" aria-label="${text.language}">
@@ -59,7 +64,7 @@ function hero(vendingPage) {
   const heading = vendingPage ? text.vendingTitle : text.hero
   return `<section class="hero ${vendingPage ? 'hero-vending' : ''}">
     <div class="hero-copy">
-      <span class="eyebrow">${vendingPage ? 'Evo Vending' : 'Evo Essentials'}</span>
+      <span class="eyebrow">${vendingPage ? 'Ieva Vending' : 'Ieva Essentials'}</span>
       <h1>${heading[0]} <em>${heading[1]}</em></h1>
       <p>${vendingPage ? text.vendingIntro : text.intro}</p>
       <button class="primary" data-scroll="${vendingPage ? 'inside' : 'collection'}">${vendingPage ? text.inside : text.shop}</button>
@@ -89,7 +94,7 @@ function essentials() {
     <div class="filters">${categories.map(value => `<button data-category="${value}" aria-pressed="${category === value}">${text[value]}</button>`).join('')}</div>
     <div class="grid" id="products">${cards()}</div>
   </section>
-  <section class="vending-link"><div>${icon('star')}<h2>Evo Vending</h2><p>${text.vendingIntro}</p><a class="primary" href="#vending">${text.inside}</a></div><img src="${asset('machine')}" alt="${text.machine}" loading="lazy"></section>`
+  <section class="vending-link"><div>${icon('star')}<h2>Ieva Vending</h2><p>${text.vendingIntro}</p><a class="primary" href="#vending">${text.inside}</a></div><img src="${asset('machine')}" alt="${text.machine}" loading="lazy"></section>`
 }
 
 function vendingPage() {
@@ -104,13 +109,13 @@ function vendingPage() {
 
 function footer() {
   const text = t()
-  return `<footer><div class="wrap footer-wrap"><div><a class="wordmark" href="#essentials" aria-label="Evo">evo<span>.</span></a><div class="footer-links"><a href="#essentials">Evo Essentials</a><a href="#vending">Evo Vending</a></div></div>
+  return `<footer><div class="wrap footer-wrap"><div>${brandLink()}<div class="footer-links"><a href="#essentials">Ieva Essentials</a><a href="#vending">Ieva Vending</a></div></div>
   <dl>${['where', 'contact', 'support'].map(key => `<div><dt>${text[key]}</dt><dd>—</dd></div>`).join('')}</dl></div></footer>`
 }
 
 function render() {
   document.documentElement.lang = lang
-  document.title = isVending() ? 'Evo Vending | Evo' : 'Evo Essentials | Evo Vending'
+  document.title = isVending() ? 'Ieva Vending | Ieva' : 'Ieva Essentials | Ieva Vending'
   app.innerHTML = `${header()}<main id="main" tabindex="-1">${isVending() ? vendingPage() : essentials()}</main>${footer()}<div class="toast" role="status" aria-live="polite"></div>`
 }
 

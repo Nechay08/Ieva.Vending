@@ -12,13 +12,13 @@ export const copy = {
     where:'Locations', contact:'Contact', support:'Support',
     empty:'Your bag is empty.', remove:'Remove', quantity:'Quantity', close:'Close',
     demo:'Preview only. Prices and checkout will be available when the shop launches.',
-    back:'Back to the collection', machine:'Illustration of the Evo personal-care vending machine',
+    back:'Back to the collection', machine:'Illustration of the Ieva personal-care vending machine',
     heroAlt:'Compact beauty and travel essentials arranged on a soft pink surface'
   },
   lv: {
     language:'Valoda', bag:'Grozs', hero:['Mazas lietas.', 'Labākas dienas.'],
     intro:'Kompakti skaistumkopšanas, ceļojumu un ikdienas piederumi, lai kurp tu dotos.',
-    shop:'Apskatīt kolekciju', collection:'Evo Essentials kolekcija',
+    shop:'Apskatīt kolekciju', collection:'Ieva Essentials kolekcija',
     collectionIntro:'Noderīgas lietas tavai somai, ikdienai un ceļojumiem.',
     all:'Visi produkti', beauty:'Skaistumkopšana', travel:'Ceļojumiem', daily:'Ikdienai', add:'Pievienot grozam', added:'Pievienots grozam',
     vendingTitle:['Rūpes tieši tad,', 'kad tās vajadzīgas.'],
@@ -28,13 +28,13 @@ export const copy = {
     where:'Atrašanās vietas', contact:'Kontakti', support:'Atbalsts',
     empty:'Tavs grozs ir tukšs.', remove:'Noņemt', quantity:'Daudzums', close:'Aizvērt',
     demo:'Veikala priekšskatījums. Cenas un pasūtīšana būs pieejamas pēc atvēršanas.',
-    back:'Atpakaļ uz kolekciju', machine:'Evo higiēnas preču automāta ilustrācija',
+    back:'Atpakaļ uz kolekciju', machine:'Ieva higiēnas preču automāta ilustrācija',
     heroAlt:'Kompakti skaistumkopšanas un ceļojumu piederumi uz maigi rozā fona'
   },
   ru: {
     language:'Язык', bag:'Корзина', hero:['Маленькие вещи.', 'Для лучших дней.'],
     intro:'Компактные аксессуары для красоты, путешествий и повседневной жизни.',
-    shop:'Смотреть коллекцию', collection:'Коллекция Evo Essentials',
+    shop:'Смотреть коллекцию', collection:'Коллекция Ieva Essentials',
     collectionIntro:'Полезные мелочи для сумки, ежедневного ухода и поездок.',
     all:'Все товары', beauty:'Красота', travel:'В дорогу', daily:'На каждый день', add:'В корзину', added:'Добавлено в корзину',
     vendingTitle:['Забота рядом,', 'когда она нужна.'],
@@ -44,7 +44,7 @@ export const copy = {
     where:'Адреса', contact:'Контакты', support:'Поддержка',
     empty:'Корзина пока пуста.', remove:'Удалить', quantity:'Количество', close:'Закрыть',
     demo:'Предпросмотр магазина. Цены и оформление заказов появятся после запуска.',
-    back:'Вернуться к коллекции', machine:'Иллюстрация автомата Evo со средствами гигиены',
+    back:'Вернуться к коллекции', machine:'Иллюстрация автомата Ieva со средствами гигиены',
     heroAlt:'Компактные аксессуары для красоты и путешествий на нежно-розовом фоне'
   }
 }

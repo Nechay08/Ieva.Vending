@@ -1,4 +1,4 @@
-# Evo Essentials / Evo Vending
+# Ieva Essentials / Ieva Vending
 
 A three-language storefront preview and personal-care vending showcase.
 
