@@ -1,0 +1,83 @@
+import { products } from '../src/catalog.js'
+import { testPrices } from '../src/test-prices.js'
+
+const byId = new Map(products.map(product => [product.id, product]))
+const shippingCountries = 'AT BE BG HR CY CZ DE DK EE ES FI FR GR HU IE IT LT LU LV MT NL PL PT RO SE SI SK'.split(' ')
+
+function json(res, status, body) {
+  res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' })
+  res.end(JSON.stringify(body))
+}
+
+async function parseBody(req) {
+  let content = ''
+  for await (const chunk of req) {
+    content += chunk
+    if (content.length > 4096) throw new Error('Request too large')
+  }
+  return JSON.parse(content)
+}
+
+export function checkoutMiddleware({ key, origin, fetchStripe = fetch }) {
+  const enabled = /^sk_test_\S+$/.test(key) && Boolean(origin)
+
+  return async (req, res, next) => {
+    const path = req.url?.split('?')[0]
+    if (path !== '/api/checkout') return next()
+    if (req.method === 'GET') return json(res, 200, { enabled })
+    if (req.method !== 'POST') return json(res, 405, { error: 'method' })
+    if (!enabled) return json(res, 503, { error: 'unavailable' })
+    if (req.headers.origin !== origin) return json(res, 403, { error: 'origin' })
+
+    let order
+    try { order = await parseBody(req) }
+    catch { return json(res, 400, { error: 'invalid_order' }) }
+
+    const items = order?.items
+    if (!Array.isArray(items) || !items.length || items.length > byId.size) {
+      return json(res, 400, { error: 'invalid_order' })
+    }
+
+    const language = ['en', 'lv', 'ru'].includes(order.language) ? order.language : 'en'
+    const params = new URLSearchParams({
+      mode: 'payment',
+      'payment_method_types[0]': 'card',
+      success_url: origin + '/?checkout=test-return#essentials',
+      cancel_url: origin + '/?checkout=canceled#essentials',
+      locale: language === 'lv' ? 'en' : language
+    })
+    for (const [index, country] of shippingCountries.entries()) {
+      params.set(`shipping_address_collection[allowed_countries][${index}]`, country)
+    }
+
+    const seen = new Set()
+    for (const [index, item] of items.entries()) {
+      const product = byId.get(item?.id)
+      if (!product || seen.has(product.id) || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 99) {
+        return json(res, 400, { error: 'invalid_order' })
+      }
+      seen.add(product.id)
+      const line = `line_items[${index}]`
+      params.set(line + '[quantity]', item.quantity)
+      params.set(line + '[price_data][currency]', 'eur')
+      params.set(line + '[price_data][unit_amount]', testPrices[product.id])
+      params.set(line + '[price_data][product_data][name]', product.name[language])
+    }
+
+    try {
+      const response = await fetchStripe('https://api.stripe.com/v1/checkout/sessions', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + key },
+        body: params,
+        signal: AbortSignal.timeout(12000)
+      })
+      const session = await response.json()
+      if (!response.ok || session.livemode !== false || !session.url?.startsWith('https://checkout.stripe.com/')) {
+        return json(res, 502, { error: 'stripe' })
+      }
+      return json(res, 200, { url: session.url })
+    } catch {
+      return json(res, 502, { error: 'stripe' })
+    }
+  }
+}

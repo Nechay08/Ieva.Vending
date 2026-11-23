@@ -116,3 +116,10 @@ body:has(dialog[open]){overflow:hidden}
   .footer-wrap{grid-template-columns:1fr;gap:24px}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+.checkout-controls{margin-top:20px}
+.checkout-controls>p:first-child{display:flex;justify-content:space-between;gap:12px;margin-bottom:12px}
+.checkout-controls .primary{width:100%}
+.checkout-controls .primary:disabled{opacity:.6;cursor:wait}
+.checkout-controls [role=status]:empty{display:none}
+.checkout-controls [role=status]{margin-top:10px;color:var(--rose)}

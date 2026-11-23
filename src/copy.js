@@ -1,5 +1,11 @@
 export const copy = {
   en: {
+    checkout: "Test checkout",
+    testNote: "Test prices · no real orders or charges",
+    testSubtotal: "Test subtotal",
+    checkoutError: "Unable to open test checkout. Try again.",
+    checkoutReturn: "Returned from Stripe test checkout.",
+    checkoutCanceled: "Test checkout canceled.",
     language:'Language', bag:'Bag', hero:['Little things.', 'Better days.'],
     intro:'Beauty, travel and everyday essentials, thoughtfully sized for wherever life takes you.',
     shop:'Explore the collection', collection:'The Essentials Collection',
@@ -16,6 +22,12 @@ export const copy = {
     heroAlt:'Compact beauty and travel essentials arranged on a soft pink surface'
   },
   lv: {
+    checkout: "Testa maksājums",
+    testNote: "Testa cenas · bez īstiem pasūtījumiem vai maksājumiem",
+    testSubtotal: "Testa starpsumma",
+    checkoutError: "Testa maksājumu nevar atvērt. Mēģini vēlreiz.",
+    checkoutReturn: "Atgriezies no Stripe testa maksājuma lapas.",
+    checkoutCanceled: "Testa maksājums atcelts.",
     language:'Valoda', bag:'Grozs', hero:['Mazas lietas.', 'Labākas dienas.'],
     intro:'Kompakti skaistumkopšanas, ceļojumu un ikdienas piederumi, lai kurp tu dotos.',
     shop:'Apskatīt kolekciju', collection:'Ieva Essentials kolekcija',
@@ -32,6 +44,12 @@ export const copy = {
     heroAlt:'Kompakti skaistumkopšanas un ceļojumu piederumi uz maigi rozā fona'
   },
   ru: {
+    checkout: "Тестовая оплата",
+    testNote: "Тестовые цены · без реальных заказов и списаний",
+    testSubtotal: "Тестовая сумма",
+    checkoutError: "Не удалось открыть тестовую оплату. Попробуй ещё раз.",
+    checkoutReturn: "Возврат со страницы тестовой оплаты Stripe.",
+    checkoutCanceled: "Тестовая оплата отменена.",
     language:'Язык', bag:'Корзина', hero:['Маленькие вещи.', 'Для лучших дней.'],
     intro:'Компактные аксессуары для красоты, путешествий и повседневной жизни.',
     shop:'Смотреть коллекцию', collection:'Коллекция Ieva Essentials',

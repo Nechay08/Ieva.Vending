@@ -1,6 +1,7 @@
 import './style.css'
 import { products, vending } from './catalog.js'
 import { copy } from './copy.js'
+import { testPrices } from './test-prices.js'
 
 const app = document.querySelector('#app')
 const panel = document.querySelector('#panel')
@@ -28,6 +29,9 @@ let lang = read('evo-language', 'en')
 if (!languages.includes(lang)) lang = 'en'
 let category = 'all'
 let activePanel = 'bag'
+let checkoutEnabled = false
+let checkoutPending = false
+const checkoutEndpoint = '/api/checkout'
 const savedBag = read('evo-bag', {})
 const bag = Object.fromEntries(products.map(({id}) => {
   const quantity = savedBag[id]
@@ -119,6 +123,46 @@ function render() {
   app.innerHTML = `${header()}<main id="main" tabindex="-1">${isVending() ? vendingPage() : essentials()}</main>${footer()}<div class="toast" role="status" aria-live="polite"></div>`
 }
 
+function formatPrice(cents) {
+  return new Intl.NumberFormat(lang, { style: 'currency', currency: 'EUR' }).format(cents / 100)
+}
+
+function checkoutControls() {
+  if (!checkoutEnabled || !count()) return ''
+  const subtotal = products.reduce((total, {id}) => total + bag[id] * testPrices[id], 0)
+  return `<div class="checkout-controls">
+    <p>${t().testSubtotal} <strong>${formatPrice(subtotal)}</strong></p>
+    <button class="primary" data-checkout ${checkoutPending ? 'disabled' : ''}>${t().checkout}</button>
+    <p role="status" data-checkout-status></p>
+  </div>`
+}
+
+async function startCheckout(button) {
+  if (checkoutPending || !checkoutEnabled) return
+  checkoutPending = true
+  button.disabled = true
+  panel.querySelector('[data-checkout-status]').textContent = ''
+  try {
+    const items = products.filter(({id}) => bag[id]).map(({id}) => ({id, quantity: bag[id]}))
+    const response = await fetch(checkoutEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items, language: lang }),
+      signal: AbortSignal.timeout(15000)
+    })
+    const result = await response.json()
+    if (!response.ok || !result.url?.startsWith('https://checkout.stripe.com/')) throw new Error()
+    location.assign(result.url)
+  } catch {
+    checkoutPending = false
+    const current = panel.querySelector('[data-checkout]')
+    if (current) {
+      current.disabled = false
+      panel.querySelector('[data-checkout-status]').textContent = t().checkoutError
+    }
+  }
+}
+
 function renderPanel() {
   const text = t()
   const product = products.find(({id}) => id === activePanel)
@@ -128,10 +172,10 @@ function renderPanel() {
   panel.innerHTML = `<div class="panel-head"><h2 id="panel-title">${title}</h2><button class="icon-button" data-close aria-label="${text.close}">${icon('close')}</button></div>` +
     (product ? `<img class="detail-img" src="${asset(product.id)}" alt="${title}"><p class="eyebrow">${text[product.category]}</p><button class="primary" data-add="${product.id}">${text.add}</button>`
     : `<div class="bag-items">${count() ? products.filter(({id}) => bag[id]).map(({id, name}) => `
-      <div class="bag-line"><img src="${asset(id)}" alt=""><div><strong>${name[lang]}</strong>
+      <div class="bag-line"><img src="${asset(id)}" alt=""><div><strong>${name[lang]}</strong>${checkoutEnabled ? `<p>${formatPrice(testPrices[id])}</p>` : ''}
         <div class="quantity"><button data-quantity="${id}" data-change="-1" aria-label="${text.quantity} −">−</button><span>${bag[id]}</span><button data-quantity="${id}" data-change="1" aria-label="${text.quantity} +">+</button></div>
         <button class="remove" data-remove="${id}">${text.remove}</button></div></div>`).join('') : `<p>${text.empty}</p>`}</div>`) +
-    `<p class="panel-note">${text.demo}</p>`
+    `${product ? '' : checkoutControls()}<p class="panel-note">${checkoutEnabled ? text.testNote : text.demo}</p>`
 }
 
 function showPanel(id) {
@@ -161,6 +205,7 @@ document.addEventListener('click', event => {
   const button = event.target.closest('button')
   if (!button) return
   const data = button.dataset
+  if ('checkout' in data) void startCheckout(button)
   if ('bag' in data) showPanel('bag')
   if ('close' in data) panel.close()
   if (data.scroll) document.getElementById(data.scroll)?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
@@ -198,3 +243,22 @@ window.addEventListener('hashchange', () => {
   document.querySelector('main').focus({ preventScroll: true })
 })
 render()
+
+fetch(checkoutEndpoint)
+  .then(response => response.ok ? response.json() : null)
+  .then(data => {
+    checkoutEnabled = data?.enabled === true
+    if (checkoutEnabled && panel.open && activePanel === 'bag') renderPanel()
+  })
+  .catch(() => {})
+
+const returnUrl = new URL(location.href)
+const checkoutResult = returnUrl.searchParams.get('checkout')
+if (['test-return', 'canceled'].includes(checkoutResult)) {
+  returnUrl.searchParams.delete('checkout')
+  history.replaceState(history.state, '', returnUrl)
+  const toast = document.querySelector('.toast')
+  toast.textContent = checkoutResult === 'test-return' ? t().checkoutReturn : t().checkoutCanceled
+  toast.classList.add('visible')
+  toastTimer = setTimeout(() => toast.classList.remove('visible'), 4500)
+}
