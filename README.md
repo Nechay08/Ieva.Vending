@@ -64,10 +64,11 @@ and its Stripe sandbox continue to use port 5173.
 
 1. Run `bash tools/syncee-preview/run.sh` in Codespaces. Enable forwarding for
    8081 from **Ports** if it does not appear automatically. Keep it **Private**
-   while completing the WordPress installer at the address printed by the script.
-   Choose a strong administrator password and disable search engine indexing.
-2. Run `bash tools/syncee-preview/run.sh plugins` after installing WordPress.
-   This installs and activates WooCommerce and Syncee.
+   during setup.
+2. Run `bash tools/syncee-preview/run.sh setup`. If WordPress is not installed,
+   the script prompts for an email and a strong password for the `ieva_admin`
+   account. It then installs and activates WooCommerce and Syncee. Open the
+   WordPress admin link printed at the end.
 3. To allow Syncee to reach the test WordPress, set only port **8081** to
    **Public** in Codespaces, then open **Syncee** in the WordPress admin and
    follow the [retailer connection guide](https://help.syncee.com/en/articles/8885881-how-to-install-syncee-to-your-wordpress-store-woocommerce-integration).

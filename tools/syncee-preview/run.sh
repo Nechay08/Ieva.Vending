@@ -30,12 +30,30 @@ case "${1:-up}" in
     printf '\nLocal service: http://localhost:8081\n'
     printf 'WordPress setup: %s/wp-admin/install.php\n' "$IEVA_WP_ORIGIN"
     ;;
-  plugins)
+  setup|plugins)
     if ! "${wp[@]}" core is-installed; then
-      printf 'Complete WordPress setup at %s/wp-admin/install.php first.\n' "$IEVA_WP_ORIGIN" >&2
-      exit 1
+      if [[ "${1:-}" != setup ]]; then
+        printf '%s\n' 'Run bash tools/syncee-preview/run.sh setup to install WordPress.' >&2
+        exit 1
+      fi
+      read -r -p 'WordPress admin email: ' admin_email
+      read -rs -p 'Choose a WordPress admin password: ' admin_password
+      printf '\n'
+      if [[ -z "$admin_email" || -z "$admin_password" ]]; then
+        printf '%s\n' 'Email and password are required.' >&2
+        exit 1
+      fi
+      printf '%s\n' "$admin_password" | "${wp[@]}" core install \
+        --url="$IEVA_WP_ORIGIN" --title='Ieva Syncee Preview' \
+        --admin_user=ieva_admin --admin_email="$admin_email" --skip-email --prompt=admin_password
+      unset admin_password
     fi
-    "${wp[@]}" plugin install woocommerce syncee-global-dropshipping --activate
+    for plugin in woocommerce syncee-global-dropshipping; do
+      if ! "${wp[@]}" plugin is-installed "$plugin"; then
+        "${wp[@]}" plugin install "$plugin"
+      fi
+      "${wp[@]}" plugin activate "$plugin"
+    done
     "${wp[@]}" rewrite structure '/%postname%/' --hard
     "${wp[@]}" option update blog_public 0
     printf '\nWordPress admin: %s/wp-admin/\n' "$IEVA_WP_ORIGIN"
@@ -44,7 +62,7 @@ case "${1:-up}" in
     "${compose[@]}" stop
     ;;
   *)
-    printf 'Usage: bash tools/syncee-preview/run.sh [up|plugins|stop]\n' >&2
+    printf 'Usage: bash tools/syncee-preview/run.sh [up|setup|plugins|stop]\n' >&2
     exit 2
     ;;
 esac
