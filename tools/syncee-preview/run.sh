@@ -30,6 +30,16 @@ fi
 compose=(docker compose --env-file "$config")
 wp=("${compose[@]}" exec -T -u www-data wordpress wp)
 
+tunnel_name=ieva-syncee-preview-tunnel
+tunnel_url_pattern='https://[a-z0-9-]+\.trycloudflare\.com'
+
+set_origin() {
+  local public_url="$1"
+  IEVA_WP_ORIGIN="$public_url" "${compose[@]}" up -d --no-build --no-deps wordpress
+  printf '%s\n' "$public_url" > "$origin_config"
+  printf '\nWordPress admin: %s/wp-admin/\n' "$public_url"
+}
+
 case "${1:-up}" in
   up)
     "${compose[@]}" up -d --build
@@ -69,25 +79,44 @@ case "${1:-up}" in
       printf '%s\n' 'Complete WordPress setup before starting a public test tunnel.' >&2
       exit 1
     fi
-    docker run --rm --network ieva-syncee-preview_default cloudflare/cloudflared:latest \
-      tunnel --no-autoupdate --url http://wordpress:80
+    if ! docker container inspect "$tunnel_name" >/dev/null 2>&1; then
+      docker run -d --rm --name "$tunnel_name" --network ieva-syncee-preview_default \
+        cloudflare/cloudflared:latest tunnel --no-autoupdate --url http://wordpress:80 >/dev/null
+    fi
+    printf '%s\n' 'Waiting for Cloudflare to assign the WordPress address...'
+    for ((attempt = 0; attempt < 45; attempt++)); do
+      if ! logs="$(docker logs "$tunnel_name" 2>&1)"; then
+        printf '%s\n' 'The tunnel stopped before returning a WordPress address.' >&2
+        exit 1
+      fi
+      if [[ "$logs" =~ ($tunnel_url_pattern) ]]; then
+        set_origin "${BASH_REMATCH[1]}"
+        exit 0
+      fi
+      sleep 1
+    done
+    printf 'Cloudflare did not assign an address. Check: docker logs %s\n' "$tunnel_name" >&2
+    exit 1
+    ;;
+  tunnel-stop)
+    if docker container inspect "$tunnel_name" >/dev/null 2>&1; then
+      docker stop "$tunnel_name" >/dev/null
+    fi
     ;;
   origin)
     public_url="${2:-}"
     public_url="${public_url%/}"
-    if [[ ! "$public_url" =~ ^https://[a-z0-9-]+\.trycloudflare\.com$ ]]; then
+    if [[ ! "$public_url" =~ ^${tunnel_url_pattern}$ ]]; then
       printf '%s\n' 'Paste the HTTPS trycloudflare.com URL printed by the tunnel.' >&2
       exit 2
     fi
-    IEVA_WP_ORIGIN="$public_url" "${compose[@]}" up -d --no-build --no-deps wordpress
-    printf '%s\n' "$public_url" > "$origin_config"
-    printf '\nWordPress admin: %s/wp-admin/\n' "$public_url"
+    set_origin "$public_url"
     ;;
   stop)
     "${compose[@]}" stop
     ;;
   *)
-    printf 'Usage: bash tools/syncee-preview/run.sh [up|setup|plugins|tunnel|origin HTTPS_URL|stop]\n' >&2
+    printf 'Usage: bash tools/syncee-preview/run.sh [up|setup|plugins|tunnel|tunnel-stop|origin HTTPS_URL|stop]\n' >&2
     exit 2
     ;;
 esac

@@ -79,9 +79,8 @@ and its Stripe sandbox continue to use port 5173.
 
 If the Codespaces forwarded URL returns 404 but WordPress works locally, use a
 temporary public [Cloudflare Quick Tunnel](https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/).
-Keep GitHub port 8081 private. Run `bash tools/syncee-preview/run.sh tunnel` and
-leave it running. Then run `bash tools/syncee-preview/run.sh origin HTTPS_URL`
-in a separate terminal, using the printed `https://…trycloudflare.com` URL.
-Open the resulting admin URL. The tunnel exposes only the installed test
-WordPress. Stop the tunnel with Ctrl+C when finished, and update the WordPress
-origin with the new URL if you restart the tunnel.
+Keep GitHub port 8081 private. Run `bash tools/syncee-preview/run.sh tunnel`
+and open the WordPress admin link it prints. The command starts the tunnel in
+the background and sets the WordPress origin to its HTTPS address. The public
+tunnel exposes only the installed test WordPress. When finished, run
+`bash tools/syncee-preview/run.sh tunnel-stop`.
