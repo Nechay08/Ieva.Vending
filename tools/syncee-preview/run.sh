@@ -10,6 +10,7 @@ if ! docker compose version >/dev/null 2>&1 || ! docker info >/dev/null 2>&1; th
 fi
 
 if [[ -n "${CODESPACE_NAME:-}" && -n "${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:-}" ]]; then
+  export IEVA_WP_BIND_HOST=0.0.0.0
   export IEVA_WP_ORIGIN="https://${CODESPACE_NAME}-8081.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
 else
   export IEVA_WP_ORIGIN=http://localhost:8081
@@ -26,7 +27,8 @@ wp=("${compose[@]}" exec -T -u www-data wordpress wp)
 case "${1:-up}" in
   up)
     "${compose[@]}" up -d --build
-    printf '\nWordPress setup: %s/wp-admin/install.php\n' "$IEVA_WP_ORIGIN"
+    printf '\nLocal service: http://localhost:8081\n'
+    printf 'WordPress setup: %s/wp-admin/install.php\n' "$IEVA_WP_ORIGIN"
     ;;
   plugins)
     if ! "${wp[@]}" core is-installed; then
