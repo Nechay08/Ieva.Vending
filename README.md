@@ -36,3 +36,23 @@ illustrative EUR prices and accepts EU delivery addresses for test input. Use
 fictional checkout details. It does not quote shipping, confirm production orders
 or send them to a supplier. This endpoint is for Vite dev and preview only. The
 static build does not contain a server.
+
+## Save paid test orders
+
+In Codespaces, install the [Stripe CLI](https://docs.stripe.com/cli/install).
+Run `stripe login` and authorize **Ieva Vending SIA sandbox**. In a separate
+terminal, start the listener:
+
+```sh
+stripe listen --events checkout.session.completed,checkout.session.async_payment_succeeded --forward-to http://localhost:5173/api/stripe/webhook
+```
+
+Add its `whsec_…` signing secret as `STRIPE_WEBHOOK_SECRET` in `.env.local`
+and restart Vite while leaving the listener running. Use the port printed by Vite
+if it differs from 5173. Keep the Stripe CLI and the checkout API key on the same
+sandbox. Complete a new test checkout from Ieva, then run
+`ls -la .ieva-orders`. Each paid session creates one JSON record with product
+IDs, quantities, amount and Stripe IDs. Repeated deliveries leave that record
+intact. The folder is local to the workspace, excluded from Git and blocked from
+web access. Records omit customer contact and address details. Older checkouts
+lack the Ieva metadata and are skipped.

@@ -50,6 +50,7 @@ export function checkoutMiddleware({ key, origin, fetchStripe = fetch }) {
     const language = ['en', 'lv', 'ru'].includes(order.language) ? order.language : 'en'
     const params = new URLSearchParams({
       mode: 'payment',
+      'metadata[ieva_source]': 'essentials_sandbox',
       success_url: origin + '/?checkout=test-return#essentials',
       cancel_url: origin + '/?checkout=canceled#essentials',
       locale: language === 'lv' ? 'en' : language
@@ -59,18 +60,22 @@ export function checkoutMiddleware({ key, origin, fetchStripe = fetch }) {
     }
 
     const seen = new Set()
+    const orderItems = []
     for (const [index, item] of items.entries()) {
       const product = byId.get(item?.id)
       if (!product || seen.has(product.id) || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 99) {
         return json(res, 400, { error: 'invalid_order' })
       }
       seen.add(product.id)
+      orderItems.push({ id: product.id, quantity: item.quantity })
       const line = `line_items[${index}]`
       params.set(line + '[quantity]', item.quantity)
       params.set(line + '[price_data][currency]', 'eur')
       params.set(line + '[price_data][unit_amount]', testPrices[product.id])
       params.set(line + '[price_data][product_data][name]', product.name[language])
     }
+
+    params.set('metadata[ieva_items]', JSON.stringify(orderItems))
 
     try {
       const response = await fetchStripe('https://api.stripe.com/v1/checkout/sessions', {
