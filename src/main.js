@@ -163,6 +163,7 @@ async function startCheckout(button) {
     const result = await response.json()
     if (!response.ok && /^[a-z_]{1,32}$/.test(result.error ?? '')) {
       diagnostic = result.error
+      if (/^[a-z_][a-z_0-9\[\]]{0,95}$/.test(result.field ?? '')) diagnostic += ' · ' + result.field
       if (/^req_[a-zA-Z0-9]+$/.test(result.requestId ?? '')) diagnostic += ' · ' + result.requestId
     }
     if (!response.ok || !result.url?.startsWith('https://checkout.stripe.com/')) throw new Error()

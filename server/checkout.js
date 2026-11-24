@@ -89,7 +89,20 @@ export function checkoutMiddleware({ key, origin, fetchStripe = fetch }) {
         }
         const requestId = response.headers.get('request-id')
         const safeRequestId = /^req_[a-zA-Z0-9]+$/.test(requestId ?? '') ? requestId : undefined
-        return json(res, 502, { error: errorCodes[response.status] ?? 'stripe_service', requestId: safeRequestId })
+        let field
+        if (response.status === 400) {
+          const rejection = await response.json().catch(() => null)
+          const parameter = rejection?.error?.param
+          if (typeof parameter === 'string' && parameter &&
+              [...params.keys()].some(name => name === parameter || name.startsWith(parameter + '['))) {
+            field = parameter
+          }
+        }
+        return json(res, 502, {
+          error: errorCodes[response.status] ?? 'stripe_service',
+          requestId: safeRequestId,
+          field
+        })
       }
       const session = await response.json()
       if (session.livemode !== false || typeof session.url !== 'string' || !session.url.startsWith('https://checkout.stripe.com/')) {
