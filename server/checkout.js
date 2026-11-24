@@ -50,7 +50,6 @@ export function checkoutMiddleware({ key, origin, fetchStripe = fetch }) {
     const language = ['en', 'lv', 'ru'].includes(order.language) ? order.language : 'en'
     const params = new URLSearchParams({
       mode: 'payment',
-      'payment_method_types[0]': 'card',
       success_url: origin + '/?checkout=test-return#essentials',
       cancel_url: origin + '/?checkout=canceled#essentials',
       locale: language === 'lv' ? 'en' : language
