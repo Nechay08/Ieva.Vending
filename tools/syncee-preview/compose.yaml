@@ -1,0 +1,45 @@
+name: ieva-syncee-preview
+
+services:
+  db:
+    image: mariadb:11.4
+    environment:
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: ${IEVA_WP_DB_PASSWORD:?}
+      MARIADB_RANDOM_ROOT_PASSWORD: 'yes'
+    volumes:
+      - database:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  wordpress:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - '127.0.0.1:8081:80'
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: ${IEVA_WP_DB_PASSWORD:?}
+      IEVA_WP_ORIGIN: ${IEVA_WP_ORIGIN:?}
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_HOME', getenv('IEVA_WP_ORIGIN'));
+        define('WP_SITEURL', WP_HOME);
+        define('WP_ENVIRONMENT_TYPE', 'staging');
+        define('DISALLOW_FILE_EDIT', true);
+        if (str_starts_with(WP_HOME, 'https://')) {
+          $$_SERVER['HTTPS'] = 'on';
+        }
+    volumes:
+      - wordpress:/var/www/html
+
+volumes:
+  database:
+  wordpress:

@@ -56,3 +56,22 @@ IDs, quantities, amount and Stripe IDs. Repeated deliveries leave that record
 intact. The folder is local to the workspace, excluded from Git and blocked from
 web access. Records omit customer contact and address details. Older checkouts
 lack the Ieva metadata and are skipped.
+
+## Test WooCommerce for Syncee
+
+This uses a separate Docker Compose stack and port **8081**. The Ieva storefront
+and its Stripe sandbox continue to use port 5173.
+
+1. Run `bash tools/syncee-preview/run.sh` in Codespaces. Enable forwarding for
+   8081 from **Ports** if it does not appear automatically. Keep it **Private**
+   while completing the WordPress installer at the address printed by the script.
+   Choose a strong administrator password and disable search engine indexing.
+2. Run `bash tools/syncee-preview/run.sh plugins` after installing WordPress.
+   This installs and activates WooCommerce and Syncee.
+3. To allow Syncee to reach the test WordPress, set only port **8081** to
+   **Public** in Codespaces, then open **Syncee** in the WordPress admin and
+   follow the [retailer connection guide](https://help.syncee.com/en/articles/8885881-how-to-install-syncee-to-your-wordpress-store-woocommerce-integration).
+   Keep port 5173 private. Use this store only with test data.
+4. When done, switch port 8081 back to **Private** and run
+   `bash tools/syncee-preview/run.sh stop`. The Docker volumes preserve the
+   test store across stops within the same Codespace.
