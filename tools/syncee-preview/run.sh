@@ -16,6 +16,12 @@ else
   export IEVA_WP_ORIGIN=http://localhost:8081
 fi
 
+origin_config=.env.wordpress-origin.local
+if [[ -s "$origin_config" ]]; then
+  read -r IEVA_WP_ORIGIN < "$origin_config"
+  export IEVA_WP_ORIGIN
+fi
+
 config=.env.wordpress.local
 if [[ ! -s "$config" ]]; then
   printf 'IEVA_WP_DB_PASSWORD=%s\n' "$(openssl rand -hex 32)" > "$config"
@@ -58,11 +64,30 @@ case "${1:-up}" in
     "${wp[@]}" option update blog_public 0
     printf '\nWordPress admin: %s/wp-admin/\n' "$IEVA_WP_ORIGIN"
     ;;
+  tunnel)
+    if ! "${wp[@]}" core is-installed; then
+      printf '%s\n' 'Complete WordPress setup before starting a public test tunnel.' >&2
+      exit 1
+    fi
+    docker run --rm --network ieva-syncee-preview_default cloudflare/cloudflared:latest \
+      tunnel --no-autoupdate --url http://wordpress:80
+    ;;
+  origin)
+    public_url="${2:-}"
+    public_url="${public_url%/}"
+    if [[ ! "$public_url" =~ ^https://[a-z0-9-]+\.trycloudflare\.com$ ]]; then
+      printf '%s\n' 'Paste the HTTPS trycloudflare.com URL printed by the tunnel.' >&2
+      exit 2
+    fi
+    IEVA_WP_ORIGIN="$public_url" "${compose[@]}" up -d --no-build --no-deps wordpress
+    printf '%s\n' "$public_url" > "$origin_config"
+    printf '\nWordPress admin: %s/wp-admin/\n' "$public_url"
+    ;;
   stop)
     "${compose[@]}" stop
     ;;
   *)
-    printf 'Usage: bash tools/syncee-preview/run.sh [up|setup|plugins|stop]\n' >&2
+    printf 'Usage: bash tools/syncee-preview/run.sh [up|setup|plugins|tunnel|origin HTTPS_URL|stop]\n' >&2
     exit 2
     ;;
 esac
